@@ -75,32 +75,38 @@ namespace OOP_SR
             Routes routes = new Routes();
             routes = PreliminaryRoutePlanning(worldMap, shipGroup);
             Route route = new Route();
-            route = RouteAdjustment(routes);
+            //route = RouteAdjustment(routes);
         }
 
         static WorldMap ReadWorldMapFromFile(string line)
         {
             WorldMap worldsMap = new WorldMap();
             string namePort = "";
-            var file = File.ReadAllLines(line);
+            double x=0, y=0;
             List<string> nameShips = new List<string>();
+            var file = File.ReadAllLines(line);
             for (int i = 0; i < file.Length; i++)
             {
                 string[] delimeters_0 = { "  ", " ", "\t" };
                 string[] mas = file[i].Split(delimeters_0, StringSplitOptions.RemoveEmptyEntries);
                 if(namePort!=mas[0] && i!=0)
                 {
-                    worldsMap.Add(ReadPortFromFile(namePort, nameShips, double.Parse(mas[2]), double.Parse(mas[3])));
+                    worldsMap.Add(ReadPortFromFile(namePort, nameShips, x, y));
+                    nameShips.Clear();
                 }
+                nameShips.Add(mas[1]);
                 namePort = mas[0];
+                x = double.Parse(mas[2]);
+                y = double.Parse(mas[3]);
             }
+            worldsMap.Add(ReadPortFromFile(namePort, nameShips, x, y));
             return worldsMap;
 
         }
 
         static Port ReadPortFromFile(string namePort, List<string> nameShip, double x, double y)
         {
-            return new Port(namePort, new Coordinate(x, y), nameShip);
+            return new Port(namePort, new Coordinate(x, y), new List<string>(nameShip));
         }
         static ShipGroup ReadShipGropFromFile(string line)
         {
@@ -127,6 +133,10 @@ namespace OOP_SR
             string nameSecondPort = ReadNamePortFromKeyboard("Введите конечный порт");
             ShipGroup shipsGroup = new ShipGroup();
             shipsGroup = ArrangingGroupShipsForTransportation(worldMap.Find(n => n.name == nameFirstPort), shipGroup, weight);
+            foreach(var i in shipsGroup)
+            {
+                Console.WriteLine(i.name);
+            }
             return routes;
         }
 
@@ -157,7 +167,7 @@ namespace OOP_SR
         }
         static bool CheckShip(double weight, Ship ship)
         {
-            if(ship.weight <=weight)
+            if(ship.weight >=weight)
             {
                 return true;
             }

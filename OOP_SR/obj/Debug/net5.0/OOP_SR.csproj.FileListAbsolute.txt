@@ -1,0 +1,16 @@
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\bin\Debug\net5.0\OOP_SR.exe
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\bin\Debug\net5.0\OOP_SR.deps.json
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\bin\Debug\net5.0\OOP_SR.runtimeconfig.json
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\bin\Debug\net5.0\OOP_SR.runtimeconfig.dev.json
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\bin\Debug\net5.0\OOP_SR.dll
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\bin\Debug\net5.0\ref\OOP_SR.dll
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\bin\Debug\net5.0\OOP_SR.pdb
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\obj\Debug\net5.0\OOP_SR.csproj.AssemblyReference.cache
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\obj\Debug\net5.0\OOP_SR.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\obj\Debug\net5.0\OOP_SR.AssemblyInfoInputs.cache
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\obj\Debug\net5.0\OOP_SR.AssemblyInfo.cs
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\obj\Debug\net5.0\OOP_SR.csproj.CoreCompileInputs.cache
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\obj\Debug\net5.0\OOP_SR.dll
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\obj\Debug\net5.0\ref\OOP_SR.dll
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\obj\Debug\net5.0\OOP_SR.pdb
+C:\Users\Vampir\source\repos\OOP_SR\OOP_SR\obj\Debug\net5.0\OOP_SR.genruntimeconfig.cache
