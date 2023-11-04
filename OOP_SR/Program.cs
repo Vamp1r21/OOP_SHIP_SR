@@ -5,6 +5,7 @@ namespace OOP_SR
 {
     using ShipGroup = List<Ship>;
     using WorldMap = List<Port>;
+    using Routes = List<Route>;
     struct Ship
     {
         public string name;
@@ -50,7 +51,16 @@ namespace OOP_SR
     {
         static void Main(string[] args)
         {
-
+            WorldMap worldMap = new WorldMap();
+            ShipGroup shipGroup = new ShipGroup();
+            worldMap = ReadWorldMapFromFile("../../../ShipTask/WorldMap.txt");
+            shipGroup = ReadShipGropFromFile("../../../ShipTask/ShipGroup.txt");
+            Routes routes = new Routes();
+            routes = PreliminaryRoutePlanning(worldMap, shipGroup);
+            Route route = new Route();
+            route = RouteAdjustment(routes);
         }
+
+
     }
 }
