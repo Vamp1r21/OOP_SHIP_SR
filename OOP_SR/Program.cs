@@ -119,5 +119,52 @@ namespace OOP_SR
             return new Ship(ships[0], double.Parse(ships[1]), double.Parse(ships[2]), double.Parse(ships[3]));
         }
 
+        static Routes PreliminaryRoutePlanning(WorldMap worldMap,ShipGroup shipGroup)
+        {
+            Routes routes = new Routes();
+            double weight = ReadWeightFromKeyboard();
+            string nameFirstPort = ReadNamePortFromKeyboard("Введите начальный порт");
+            string nameSecondPort = ReadNamePortFromKeyboard("Введите конечный порт");
+            ShipGroup shipsGroup = new ShipGroup();
+            shipsGroup = ArrangingGroupShipsForTransportation(worldMap.Find(n => n.name == nameFirstPort), shipGroup, weight);
+            return routes;
+        }
+
+        static double ReadWeightFromKeyboard()
+        {
+            Console.WriteLine("Введите вес груза");
+            return double.Parse(Console.ReadLine());
+        }
+
+        static string ReadNamePortFromKeyboard(string text)
+        {
+            Console.WriteLine($"{text}");
+            return Console.ReadLine();
+        }
+
+        static ShipGroup ArrangingGroupShipsForTransportation(Port port, ShipGroup shipGroup, double weight)
+        {
+            ShipGroup shipsGroup = new ShipGroup();
+            foreach(var i in port.namesShips)
+            {
+                Ship ship = shipGroup.Find(n => n.name == i);
+                if(CheckShip(weight, ship)==true)
+                {
+                    shipsGroup.Add(ship);
+                }
+            }
+            return shipsGroup;
+        }
+        static bool CheckShip(double weight, Ship ship)
+        {
+            if(ship.weight <=weight)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }
