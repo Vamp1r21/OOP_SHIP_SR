@@ -29,6 +29,13 @@ namespace OOP_SR
         public Coordinate coordinates;
         public List<string> namesShips;
         //public ShipGroup ships;
+
+        public Port(string name, Coordinate coordinates, List<string> namesShips)
+        {
+            this.name = name;
+            this.coordinates = coordinates;
+            this.namesShips = namesShips;
+        }
     }
 
     struct Coordinate
@@ -73,16 +80,28 @@ namespace OOP_SR
 
         static WorldMap ReadWorldMapFromFile(string line)
         {
-            WorldMap worlsMap = new WorldMap();
+            WorldMap worldsMap = new WorldMap();
+            string namePort = "";
             var file = File.ReadAllLines(line);
+            List<string> nameShips = new List<string>();
             for (int i = 0; i < file.Length; i++)
             {
-                string lines = file[i];
                 string[] delimeters_0 = { "  ", " ", "\t" };
+                string[] mas = file[i].Split(delimeters_0, StringSplitOptions.RemoveEmptyEntries);
+                if(namePort!=mas[0] && i!=0)
+                {
+                    worldsMap.Add(ReadPortFromFile(namePort, nameShips, double.Parse(mas[2]), double.Parse(mas[3])));
+                }
+                namePort = mas[0];
             }
+            return worldsMap;
 
         }
 
+        static Port ReadPortFromFile(string namePort, List<string> nameShip, double x, double y)
+        {
+            return new Port(namePort, new Coordinate(x, y), nameShip);
+        }
         static ShipGroup ReadShipGropFromFile(string line)
         {
             ShipGroup shipGroup = new ShipGroup();
