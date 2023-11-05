@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace OOP_SR
@@ -78,6 +79,8 @@ namespace OOP_SR
     {
         static void Main(string[] args)
         {
+            //Stopwatch stopwatch = new Stopwatch();
+            //stopwatch.Start();
             WorldMap worldMap = new WorldMap();
             ShipGroup shipGroup = new ShipGroup();
             worldMap = ReadWorldMapFromFile("../../../ShipTask/WorldMap.txt");
@@ -85,7 +88,10 @@ namespace OOP_SR
             Flights flights = new Flights();
             flights = PreliminaryRoutePlanning(worldMap, shipGroup);
             Flight flight = ChoiceFlight(flights);
-            //route = RouteAdjustment(routes);
+            flight = EditFlight(flight, worldMap, shipGroup);
+            PrintNewFlight(flight);
+            //stopwatch.Stop();
+            //Console.WriteLine(stopwatch.ElapsedMilliseconds);
         }
 
         static WorldMap ReadWorldMapFromFile(string line)
@@ -291,8 +297,67 @@ namespace OOP_SR
         }
         static int ReadNumberFromKeyboard()
         {
-            Console.WriteLine("Введите носер рейса");
+            Console.WriteLine("Введите номер рейса");
             return int.Parse(Console.ReadLine());
+        }
+        static Flight EditFlight(Flight flight, WorldMap worldMap, ShipGroup shipGroup)
+        {
+            int answer = ReadAnswerFromKeyboard();
+            if(answer==0)
+            {
+                return flight;
+            }
+            else
+            {
+                Ship ship = shipGroup.Find(n => n.name == flight.nameShip);
+                flight.route = ReadNewRoute(worldMap);
+                flight.time = Math.Round((flight.route.length / ship.speed), 2);
+                return flight;
+            }
+        }
+
+        static int ReadAnswerFromKeyboard()
+        {
+            Console.WriteLine("Будете ли вы менять маршрут 1(Да) 0(Нет)");
+            return int.Parse(Console.ReadLine());
+        }
+
+        static Route ReadNewRoute(WorldMap worldMap)
+        {
+            Route route = new Route();
+            route.rout = ReadNewRouteFromKeybard();
+            for (int i = 0; i <= route.rout.Count; i++)
+            {
+                if(i<= route.rout.Count-2)
+                route.length += CalculationLength(worldMap.Find(n => n.name == route.rout[i]), worldMap.Find(n => n.name == route.rout[i+1]));
+            }
+            return route;
+        }
+
+        static List<string> ReadNewRouteFromKeybard()
+        {
+            List<string> rout = new List<string>();
+            Console.WriteLine("Введите новый маршрут когда закончите введите пустое значение");
+            while (true)
+            {
+                string name = Console.ReadLine();
+                if (name != "")
+                {
+                    rout.Add(name);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return rout;
+        }
+
+        static void PrintNewFlight(Flight flight)
+        {
+            Console.Write($"Порт отправления: {flight.nameFirstPort} Порт назначения: {flight.nameSecondPort}" +
+                    $" Название корабля: {flight.nameShip} Время: {flight.time} Маршрут: ");
+            PrintRoute(flight.route);
         }
     }
 }
