@@ -7,6 +7,7 @@ namespace OOP_SR
     using ShipGroup = List<Ship>;
     using WorldMap = List<Port>;
     using Routes = List<Route>;
+    using Flights = List<Flight>;
     struct Ship
     {
         public string name;
@@ -58,11 +59,20 @@ namespace OOP_SR
 
     struct Flight
     {
-        public string nameFirsPort;
+        public string nameFirstPort;
         public string nameSecondPort;
         public string nameShip;
         public Route route;
-        public int time;
+        public double time;
+
+        public Flight(string nameFirstPort, string nameSecondPort, string nameShip, Route route, double time)
+        {
+            this.nameFirstPort = nameFirstPort;
+            this.nameSecondPort = nameSecondPort;
+            this.nameShip = nameShip;
+            this.route = route;
+            this.time = time;
+        }
     }
     class Program
     {
@@ -72,9 +82,9 @@ namespace OOP_SR
             ShipGroup shipGroup = new ShipGroup();
             worldMap = ReadWorldMapFromFile("../../../ShipTask/WorldMap.txt");
             shipGroup = ReadShipGropFromFile("../../../ShipTask/ShipGroup.txt");
-            Routes routes = new Routes();
-            routes = PreliminaryRoutePlanning(worldMap, shipGroup);
-            List<Route> route = new List<Route>();
+            Flights flights = new Flights();
+            flights = PreliminaryRoutePlanning(worldMap, shipGroup);
+            Flight flight = ChoiceFlight(flights);
             //route = RouteAdjustment(routes);
         }
 
@@ -125,9 +135,9 @@ namespace OOP_SR
             return new Ship(ships[0], double.Parse(ships[1]), double.Parse(ships[2]), double.Parse(ships[3]));
         }
 
-        static Routes PreliminaryRoutePlanning(WorldMap worldMap,ShipGroup shipGroup)
+        static Flights PreliminaryRoutePlanning(WorldMap worldMap,ShipGroup shipGroup)
         {
-            Routes routes = new Routes();
+            Flights flights = new Flights();
             double weight = ReadWeightFromKeyboard();
             string nameFirstPort = ReadNamePortFromKeyboard("Введите начальный порт");
             string nameSecondPort = ReadNamePortFromKeyboard("Введите конечный порт");
@@ -135,9 +145,11 @@ namespace OOP_SR
             shipsGroup = ArrangingGroupShipsForTransportation(worldMap.Find(n => n.name == nameFirstPort), shipGroup, weight);
             foreach(var i in shipsGroup)
             {
-                routes.Add(CalculationRoutFromShip(nameFirstPort, nameSecondPort, worldMap, i));
+                Route route = new Route();
+                route = (CalculationRoutFromShip(nameFirstPort, nameSecondPort, worldMap, i));
+                flights.Add(new Flight(nameFirstPort, nameSecondPort, i.name, route, Math.Round((route.length / i.speed),2)));
             }
-            return routes;
+            return flights;
         }
 
         static double ReadWeightFromKeyboard()
@@ -246,6 +258,41 @@ namespace OOP_SR
             double lenght = Math.Sqrt(Math.Pow(secondPort.coordinates.x - firstPort.coordinates.x, 2) +
                 Math.Pow(secondPort.coordinates.y - firstPort.coordinates.y, 2));
             return lenght;
+        }
+
+        static Flight ChoiceFlight(Flights flights)
+        {
+            Flight flight = new Flight();
+            PrintFlight(flights);
+            int number = ReadNumberFromKeyboard();
+            flight = flights[number - 1];
+            return flight;
+        }
+
+        static void PrintFlight(Flights flights)
+        {
+            int number = 1;
+            foreach (var i in flights)
+            {
+                Console.Write($"№{number} Порт отправления: {i.nameFirstPort} Порт назначения: {i.nameSecondPort}" +
+                    $" Название корабля: {i.nameShip} Время: {i.time} Маршрут: ");
+                PrintRoute(i.route);
+                number++;
+            }
+        }
+
+        static void PrintRoute(Route route)
+        {
+            foreach (var i in route.rout)
+            {
+                Console.Write($" {i}");
+            }
+            Console.Write("\n");
+        }
+        static int ReadNumberFromKeyboard()
+        {
+            Console.WriteLine("Введите носер рейса");
+            return int.Parse(Console.ReadLine());
         }
     }
 }
