@@ -74,7 +74,7 @@ namespace OOP_SR
             shipGroup = ReadShipGropFromFile("../../../ShipTask/ShipGroup.txt");
             Routes routes = new Routes();
             routes = PreliminaryRoutePlanning(worldMap, shipGroup);
-            Route route = new Route();
+            List<Route> route = new List<Route>();
             //route = RouteAdjustment(routes);
         }
 
@@ -135,7 +135,7 @@ namespace OOP_SR
             shipsGroup = ArrangingGroupShipsForTransportation(worldMap.Find(n => n.name == nameFirstPort), shipGroup, weight);
             foreach(var i in shipsGroup)
             {
-                Console.WriteLine(i.name);
+                routes.Add(CalculationRoutFromShip(nameFirstPort, nameSecondPort, worldMap, i));
             }
             return routes;
         }
@@ -175,6 +175,77 @@ namespace OOP_SR
             {
                 return false;
             }
+        }
+
+        static Route CalculationRoutFromShip(string nameFirstPort, string nameSecondPort, WorldMap worldMap, Ship ship)
+        {
+            Route route = new Route();
+            List<string> port = new List<string>();
+            port.Add(nameFirstPort);
+            double length = 0;
+            Port firstPort = worldMap.Find(n => n.name == nameFirstPort);
+            Port secondPort = worldMap.Find(n => n.name == nameSecondPort);
+            length = CalculationLength(firstPort, secondPort);
+            if(length>ship.range)
+            {
+                length = 0;
+                CalculationRout(nameFirstPort, nameSecondPort, port, worldMap, ship);
+                route.rout = port;
+                for (int i = 0; i < port.Count; i++)
+                {
+                    if (i <= port.Count-2)
+                    {
+                        firstPort = worldMap.Find(n => n.name == port[i]);
+                        secondPort = worldMap.Find(n => n.name == port[i + 1]);
+                        length += CalculationLength(firstPort, secondPort);
+                        route.length = length;
+                    }
+                }
+            }
+            else
+            {
+                port.Add(nameSecondPort);
+                route.length = length;
+                route.rout = port;
+            }
+            return route;
+        }
+
+        static void CalculationRout(string namePort, string nameSecondPort, List<string> port, WorldMap worldMap, Ship ship)
+        {
+            string namePorts = "";
+            foreach(var i in worldMap)
+            {
+                if(!port.Contains(i.name))
+                {
+                    double length= CalculationLength(worldMap.Find(n => n.name == namePort), i);
+                    if(ship.range>=length)
+                    {
+                        if(i.name==nameSecondPort)
+                        {
+                            port.Add(i.name);
+                            break;
+                        }
+                        else
+                        {
+                            namePorts = i.name;
+                        }
+                    }
+                    else
+                    {
+                        port.Add(namePorts);
+                        CalculationRout(namePorts, nameSecondPort, port, worldMap, ship);
+                        break;
+                    }
+                }
+            }
+        }
+
+        static double CalculationLength(Port firstPort, Port secondPort)
+        {
+            double lenght = Math.Sqrt(Math.Pow(secondPort.coordinates.x - firstPort.coordinates.x, 2) +
+                Math.Pow(secondPort.coordinates.y - firstPort.coordinates.y, 2));
+            return lenght;
         }
     }
 }
