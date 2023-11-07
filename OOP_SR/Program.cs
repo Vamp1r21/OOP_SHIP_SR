@@ -7,7 +7,6 @@ namespace OOP_SR
 {
     using ShipGroup = List<Ship>;
     using WorldMap = List<Port>;
-    using Routes = List<Route>;
     using Flights = List<Flight>;
     struct Ship
     {
@@ -30,7 +29,6 @@ namespace OOP_SR
         public string name;
         public Coordinate coordinates;
         public List<string> namesShips;
-        //public ShipGroup ships;
 
         public Port(string name, Coordinate coordinates, List<string> namesShips)
         {
@@ -79,8 +77,6 @@ namespace OOP_SR
     {
         static void Main(string[] args)
         {
-            //Stopwatch stopwatch = new Stopwatch();
-            //stopwatch.Start();
             WorldMap worldMap = new WorldMap();
             ShipGroup shipGroup = new ShipGroup();
             worldMap = ReadWorldMapFromFile("../../../ShipTask/WorldMap.txt");
@@ -90,8 +86,6 @@ namespace OOP_SR
             Flight flight = ChoiceFlight(flights);
             flight = EditFlight(flight, worldMap, shipGroup);
             PrintNewFlight(flight);
-            //stopwatch.Stop();
-            //Console.WriteLine(stopwatch.ElapsedMilliseconds);
         }
 
         static WorldMap ReadWorldMapFromFile(string line)
@@ -119,11 +113,6 @@ namespace OOP_SR
             return worldsMap;
 
         }
-
-        static Port ReadPortFromFile(string namePort, List<string> nameShip, double x, double y)
-        {
-            return new Port(namePort, new Coordinate(x, y), new List<string>(nameShip));
-        }
         static ShipGroup ReadShipGropFromFile(string line)
         {
             ShipGroup shipGroup = new ShipGroup();
@@ -136,12 +125,8 @@ namespace OOP_SR
             }
             return shipGroup;
         }
-        static Ship ReadShipFromFile(string[] ships)
-        {
-            return new Ship(ships[0], double.Parse(ships[1]), double.Parse(ships[2]), double.Parse(ships[3]));
-        }
 
-        static Flights PreliminaryRoutePlanning(WorldMap worldMap,ShipGroup shipGroup)
+        static Flights PreliminaryRoutePlanning(WorldMap worldMap, ShipGroup shipGroup)
         {
             Flights flights = new Flights();
             double weight = ReadWeightFromKeyboard();
@@ -149,14 +134,52 @@ namespace OOP_SR
             string nameSecondPort = ReadNamePortFromKeyboard("Введите конечный порт");
             ShipGroup shipsGroup = new ShipGroup();
             shipsGroup = ArrangingGroupShipsForTransportation(worldMap.Find(n => n.name == nameFirstPort), shipGroup, weight);
-            foreach(var i in shipsGroup)
+            foreach (var i in shipsGroup)
             {
                 Route route = new Route();
                 route = (CalculationRoutFromShip(nameFirstPort, nameSecondPort, worldMap, i));
-                flights.Add(new Flight(nameFirstPort, nameSecondPort, i.name, route, Math.Round((route.length / i.speed),2)));
+                flights.Add(new Flight(nameFirstPort, nameSecondPort, i.name, route, Math.Round((route.length / i.speed), 2)));
             }
             return flights;
         }
+        static Flight ChoiceFlight(Flights flights)
+        {
+            Flight flight = new Flight();
+            PrintFlight(flights);
+            int number = ReadNumberFromKeyboard();
+            flight = flights[number - 1];
+            return flight;
+        }
+        static Flight EditFlight(Flight flight, WorldMap worldMap, ShipGroup shipGroup)
+        {
+            int answer = ReadAnswerFromKeyboard();
+            if (answer == 0)
+            {
+                return flight;
+            }
+            else
+            {
+                Ship ship = shipGroup.Find(n => n.name == flight.nameShip);
+                flight.route = ReadNewRoute(worldMap);
+                flight.time = Math.Round((flight.route.length / ship.speed), 2);
+                return flight;
+            }
+        }
+        static void PrintNewFlight(Flight flight)
+        {
+            Console.Write($"Порт отправления: {flight.nameFirstPort} Порт назначения: {flight.nameSecondPort}" +
+                    $" Название корабля: {flight.nameShip} Время: {flight.time} Маршрут: ");
+            PrintRoute(flight.route);
+        }
+        static Port ReadPortFromFile(string namePort, List<string> nameShip, double x, double y)
+        {
+            return new Port(namePort, new Coordinate(x, y), new List<string>(nameShip));
+        }
+        static Ship ReadShipFromFile(string[] ships)
+        {
+            return new Ship(ships[0], double.Parse(ships[1]), double.Parse(ships[2]), double.Parse(ships[3]));
+        }
+
 
         static double ReadWeightFromKeyboard()
         {
@@ -228,53 +251,6 @@ namespace OOP_SR
             }
             return route;
         }
-
-        static void CalculationRout(string namePort, string nameSecondPort, List<string> port, WorldMap worldMap, Ship ship)
-        {
-            string namePorts = "";
-            foreach(var i in worldMap)
-            {
-                if(!port.Contains(i.name))
-                {
-                    double length= CalculationLength(worldMap.Find(n => n.name == namePort), i);
-                    if(ship.range>=length)
-                    {
-                        if(i.name==nameSecondPort)
-                        {
-                            port.Add(i.name);
-                            break;
-                        }
-                        else
-                        {
-                            namePorts = i.name;
-                        }
-                    }
-                    else
-                    {
-                        port.Add(namePorts);
-                        CalculationRout(namePorts, nameSecondPort, port, worldMap, ship);
-                        break;
-                    }
-                }
-            }
-        }
-
-        static double CalculationLength(Port firstPort, Port secondPort)
-        {
-            double lenght = Math.Sqrt(Math.Pow(secondPort.coordinates.x - firstPort.coordinates.x, 2) +
-                Math.Pow(secondPort.coordinates.y - firstPort.coordinates.y, 2));
-            return lenght;
-        }
-
-        static Flight ChoiceFlight(Flights flights)
-        {
-            Flight flight = new Flight();
-            PrintFlight(flights);
-            int number = ReadNumberFromKeyboard();
-            flight = flights[number - 1];
-            return flight;
-        }
-
         static void PrintFlight(Flights flights)
         {
             int number = 1;
@@ -286,6 +262,50 @@ namespace OOP_SR
                 number++;
             }
         }
+
+        static void CalculationRout(string namePort, string nameSecondPort, List<string> port, WorldMap worldMap, Ship ship)
+        {
+            string namePorts = "";
+            double checkLength = 0;
+            foreach(var i in worldMap)
+            {
+                if(!port.Contains(i.name))
+                {
+                    double length= CalculationLength(worldMap.Find(n => n.name == namePort), i);
+                    if(ship.range>=length)
+                    {
+                        if(i.name==nameSecondPort)
+                        {
+                            namePorts = i.name;
+                            port.Add(i.name);
+                            break;
+                        }
+                        else
+                        {
+                            if (checkLength < length)
+                            {
+                                namePorts = i.name;
+                                checkLength = length;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (namePorts != nameSecondPort && namePorts!="")
+            {
+                port.Add(namePorts);
+                CalculationRout(namePorts, nameSecondPort, port, worldMap, ship);
+            }
+        }
+
+        static double CalculationLength(Port firstPort, Port secondPort)
+        {
+            double lenght = Math.Sqrt(Math.Pow(secondPort.coordinates.x - firstPort.coordinates.x, 2) +
+                Math.Pow(secondPort.coordinates.y - firstPort.coordinates.y, 2));
+            return lenght;
+        }
+
 
         static void PrintRoute(Route route)
         {
@@ -299,21 +319,6 @@ namespace OOP_SR
         {
             Console.WriteLine("Введите номер рейса");
             return int.Parse(Console.ReadLine());
-        }
-        static Flight EditFlight(Flight flight, WorldMap worldMap, ShipGroup shipGroup)
-        {
-            int answer = ReadAnswerFromKeyboard();
-            if(answer==0)
-            {
-                return flight;
-            }
-            else
-            {
-                Ship ship = shipGroup.Find(n => n.name == flight.nameShip);
-                flight.route = ReadNewRoute(worldMap);
-                flight.time = Math.Round((flight.route.length / ship.speed), 2);
-                return flight;
-            }
         }
 
         static int ReadAnswerFromKeyboard()
@@ -351,13 +356,6 @@ namespace OOP_SR
                 }
             }
             return rout;
-        }
-
-        static void PrintNewFlight(Flight flight)
-        {
-            Console.Write($"Порт отправления: {flight.nameFirstPort} Порт назначения: {flight.nameSecondPort}" +
-                    $" Название корабля: {flight.nameShip} Время: {flight.time} Маршрут: ");
-            PrintRoute(flight.route);
         }
     }
 }
